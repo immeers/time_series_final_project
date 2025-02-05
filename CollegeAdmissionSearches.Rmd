@@ -1,0 +1,37 @@
+---
+title: "College Admission Searches"
+author: "Imogen Meers"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r}
+library(forecast)
+library(readxl)
+library(ggplot2)
+harvard.data <- read_delim("./data/harvard_admission.csv", delim = ",", skip = 1)
+
+summary(harvard.data)
+harvard.ts <- ts(harvard.data$`harvard admission: (United States)`, start = c(2020, 5), end = c(2025, 5), freq = 52)
+
+autoplot(harvard.ts) +
+  geom_line(color = "black")
+```
+```{r Check for random walk}
+diff.harvard.ts <- diff(harvard.ts)
+Acf(diff.harvard.ts)
+```
+```{r}
+harvard.ar.1 <- Arima(harvard.ts, order = c(1, 0, 0))
+summary(harvard.ar.1)
+(0.5434-1)/(0.0517)
+```
+We can conclude that our coefficient 0.5434 is significantly different from 0. 
+
+Null Hypothesis: beta = 1 (i.e., random walk)
+
+Alternative Hypothesis: beta not equal to 1 (i.e., not random walk)
+
+To be specific, our t-stat = (coefficient - 1)/s.e = (0.5434-1)/(0.0517) = -8.831721. 
+t-stat = +-/1.96 at 95% confidence interval
+
+-8.831721 < -1.96 so significant, there is significant evidence to reject null hypothesis.
