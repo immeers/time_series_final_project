@@ -1,9 +1,30 @@
 ---
 title: "College Admission Searches"
-author: "Imogen Meers"
+subtitle: "Will the Top-Ranked Schools Change?"
+author: "Imogen Meers, Sarah Deussing, & Sarah Cernugel"
 date: "`r Sys.Date()`"
 output: html_document
 ---
+
+## Objective
+What is the objective of performing time series forecasting and who would it benefit? 
+This analysis will forecast the number of Google Searches for admissions data of the top five nationally ranked U.S. universities. The current U.S. News rankings are as follows:
+
+  1. Princeton University
+  2. Massachusetts Institute of Technology
+  3. Harvard University
+  4. Stanford University
+  5. Yale University
+
+Data was obtained from Google Search statistics for each school; the search terms are "[school name] admissions." Each dataset contains two columns: the date and the number of searches for the term. These are weekly time series with five years of data.
+
+Time-series analysis will be performed to identify trends and seasonality in each dataset. Following, a forecast will predict future weekly search amounts. Doing so will determine if specific schools are projected to rise or fall in popularity, which can in turn lead to a rise or fall in admissions difficulty. A school projected to see a spike in admissions search numbers in the next year correlates to an increase in the number of applications, and thus the difficulty of admission. From this outcome, our team can project if the current U.S. News rankings are going to change, as schools with more competitive admissions may rise in overall rank.
+
+The audience for this project are high school juniors and seniors going through the college application process. These students can use the forecasted search numbers and possible ranking changes to determine which schools they should apply to and which may be more or less competitive in the next year. This project can be expanded to include any set of schools in which a person wants to apply. 
+
+## Initial Data Analysis
+
+The first step in the time series process is to check if each dataset is a random walk. If so, this means that the dataset does not have any trends or seasonality that emerge, and thus cannot be used for forecasting. The following code does so for the Harvard admissions data.
 ```{r}
 library(forecast)
 library(readxl)
@@ -16,6 +37,8 @@ harvard.ts <- ts(harvard.data$`harvard admission: (United States)`, start = c(20
 autoplot(harvard.ts) +
   geom_line(color = "black")
 ```
+
+
 ```{r Check for random walk}
 diff.harvard.ts <- diff(harvard.ts)
 Acf(diff.harvard.ts)
