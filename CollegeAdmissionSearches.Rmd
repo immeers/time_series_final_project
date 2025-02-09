@@ -26,7 +26,7 @@ The audience for this project are high school juniors and seniors, and admission
 
 ## Initial Data Analysis
 
-The first step in the time series process is to check if each dataset is a random walk. If so, this means that the  the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for the top 5 schools' data.
+The first step in the time series process is to check if each dataset is a random walk. If so, this means that the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for the top 5 schools' data.
 ```{r, message=FALSE, warning =FALSE}
 library(forecast)
 library(readr)
