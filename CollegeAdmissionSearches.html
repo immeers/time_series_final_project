@@ -11,7 +11,7 @@
 
 <meta name="author" content="Imogen Meers, Sarah Deussing, &amp; Sarah Cernugel" />
 
-<meta name="date" content="2025-02-06" />
+<meta name="date" content="2025-02-09" />
 
 <title>College Admission Searches</title>
 
@@ -354,7 +354,7 @@ display: none;
 <h3 class="subtitle">Will the Top-Ranked Schools Change?</h3>
 <h4 class="author">Imogen Meers, Sarah Deussing, &amp; Sarah
 Cernugel</h4>
-<h4 class="date">2025-02-06</h4>
+<h4 class="date">2025-02-09</h4>
 
 </div>
 
@@ -373,21 +373,20 @@ universities. The current U.S. News rankings are as follows:</p>
 <li>Yale University</li>
 </ol>
 <p>Data was obtained from Google Search statistics for each school; the
-search terms are “[school name] admissions.” Each dataset contains two
+search terms are “[school name] admission.” Each dataset contains two
 columns: the date and the number of searches for the term. These are
 weekly time series with five years of data.</p>
 <p>Time-series analysis will be performed to identify trends and
 seasonality in each dataset. Following, a forecast will predict future
 weekly search amounts. Doing so will determine if specific schools are
-projected to rise or fall in popularity, which can in turn lead to a
-rise or fall in admissions difficulty. A school projected to see a spike
-in admissions search numbers in the next year correlates to an increase
-in the number of applications, and thus the difficulty of admission.
-From this outcome, our team can project if the current U.S. News
-rankings are going to change, as schools with more competitive
-admissions may rise in overall rank.</p>
-<p>The audience for this project are high school juniors and seniors and
-admission councillors going through the college application process.
+projected to rise or fall in popularity.</p>
+<p>It is likely that a school projected to see a spike in admissions
+search numbers in the next year, may have an increase in the number of
+applications, and thus the difficulty of admission. This would be useful
+information to determine changes in admission rate and exclusivity of
+schools in the future.</p>
+<p>The audience for this project are high school juniors and seniors,
+and admission counselors going through the college application process.
 These students can use the forecasted search numbers and possible
 ranking changes to determine which schools they should apply to and
 which may be more or less competitive in the next year. This project can
@@ -397,10 +396,9 @@ apply.</p>
 <div id="initial-data-analysis" class="section level2">
 <h2>Initial Data Analysis</h2>
 <p>The first step in the time series process is to check if each dataset
-is a random walk. If so, this means that the dataset does not have any
-trends or seasonality that emerge, and thus cannot be used for
-forecasting. The following code does so for the Harvard admissions
-data.</p>
+is a random walk. If so, this means that the the best possible forecast
+for this dataset is a naive forecast and there is no need to apply any
+modelling. The following code does so for the top 5 schools’ data.</p>
 <pre class="r"><code>library(forecast)
 library(readr)
 library(ggplot2)
@@ -555,6 +553,9 @@ for (i in (1:length(file_paths))){
 ##  0.024  0.009  0.028 -0.078  0.050 -0.013  0.068 -0.087  0.039 -0.028  0.029 
 ##     99    100    101    102    103    104 
 ## -0.038  0.024 -0.003 -0.026  0.003  0.058</code></pre>
+<p>All ACF plots show significant correlation after differencing meaning
+these time series are not random walks.</p>
+<p>To further prove this, we will also perform hypothesis testing.</p>
 <pre class="r"><code>for (i in (1:length(file_paths))){
   
   college.ts = data_sets[[i]]
@@ -671,7 +672,8 @@ walk)</p>
 <p>To be specific, our t-stat = (coefficient - 1)/s.e = t-stat = +-/1.96
 at 95% confidence interval</p>
 <p>All t-stat are &lt; -1.96 so are significant, there is significant
-evidence to reject null hypothesis.</p>
+evidence to reject null hypothesis. These time series are not random
+walks.</p>
 </div>
 
 

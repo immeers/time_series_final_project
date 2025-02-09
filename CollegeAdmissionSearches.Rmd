@@ -16,15 +16,17 @@ This analysis will forecast the number of Google Searches for admissions data of
   4. Stanford University
   5. Yale University
 
-Data was obtained from Google Search statistics for each school; the search terms are "[school name] admissions." Each dataset contains two columns: the date and the number of searches for the term. These are weekly time series with five years of data.
+Data was obtained from Google Search statistics for each school; the search terms are "[school name] admission." Each dataset contains two columns: the date and the number of searches for the term. These are weekly time series with five years of data.
 
-Time-series analysis will be performed to identify trends and seasonality in each dataset. Following, a forecast will predict future weekly search amounts. Doing so will determine if specific schools are projected to rise or fall in popularity, which can in turn lead to a rise or fall in admissions difficulty. A school projected to see a spike in admissions search numbers in the next year correlates to an increase in the number of applications, and thus the difficulty of admission. From this outcome, our team can project if the current U.S. News rankings are going to change, as schools with more competitive admissions may rise in overall rank.
+Time-series analysis will be performed to identify trends and seasonality in each dataset. Following, a forecast will predict future weekly search amounts. Doing so will determine if specific schools are projected to rise or fall in popularity. 
 
-The audience for this project are high school juniors and seniors and admission councillors going through the college application process. These students can use the forecasted search numbers and possible ranking changes to determine which schools they should apply to and which may be more or less competitive in the next year. This project can be expanded to include any set of schools in which a person wants to apply. 
+It is likely that a school projected to see a spike in admissions search numbers in the next year, may have an increase in the number of applications, and thus the difficulty of admission. This would be useful information to determine changes in admission rate and exclusivity of schools in the future.
+
+The audience for this project are high school juniors and seniors, and admission counselors going through the college application process. These students can use the forecasted search numbers and possible ranking changes to determine which schools they should apply to and which may be more or less competitive in the next year. This project can be expanded to include any set of schools in which a person wants to apply. 
 
 ## Initial Data Analysis
 
-The first step in the time series process is to check if each dataset is a random walk. If so, this means that the dataset does not have any trends or seasonality that emerge, and thus cannot be used for forecasting. The following code does so for the Harvard admissions data.
+The first step in the time series process is to check if each dataset is a random walk. If so, this means that the  the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for the top 5 schools' data.
 ```{r, message=FALSE, warning =FALSE}
 library(forecast)
 library(readr)
@@ -66,10 +68,11 @@ for (i in (1:length(file_paths))){
   print(Acf(diff.ts, main = college_names[i]))
 }
 ```
+All ACF plots show significant correlation after differencing meaning these time series are not random walks.
+
+To further prove this, we will also perform hypothesis testing.
 
 ```{r}
-
-
 for (i in (1:length(file_paths))){
   
   college.ts = data_sets[[i]]
@@ -97,4 +100,4 @@ Alternative Hypothesis: beta not equal to 1 (i.e., not random walk)
 To be specific, our t-stat = (coefficient - 1)/s.e = 
 t-stat = +-/1.96 at 95% confidence interval
 
-All t-stat are < -1.96 so are significant, there is significant evidence to reject null hypothesis.
+All t-stat are < -1.96 so are significant, there is significant evidence to reject null hypothesis. These time series are not random walks.
