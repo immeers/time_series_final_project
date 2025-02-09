@@ -1,9 +1,11 @@
 ---
 title: "College Admission Searches"
-subtitle: "Will the Top-Ranked Schools Change?"
 author: "Imogen Meers, Sarah Deussing, & Sarah Cernugel"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
+subtitle: "Will the Top-Ranked Schools Change?"
 ---
 
 ## Objective
