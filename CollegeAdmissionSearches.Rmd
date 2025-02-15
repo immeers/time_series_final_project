@@ -55,8 +55,6 @@ for (i in (1:length(file_paths))){
   print(g)
   data_sets[[i]] <- college.ts
 }
-
-
 ```
 
 
@@ -88,11 +86,10 @@ for (i in (1:length(file_paths))){
   ar1_se <- sqrt(diag(college.ar.1$var.coef))['ar1']
   
   print(paste("Is significant?" , -1.96 > (ar1_intercept-1)/ar1_se))
-
-
 }
 
 ```
+
 We can conclude that all our coefficients are significantly different from 0. 
 
 Null Hypothesis: beta = 1 (i.e., random walk)
@@ -103,3 +100,21 @@ To be specific, our t-stat = (coefficient - 1)/s.e =
 t-stat = +-/1.96 at 95% confidence interval
 
 All t-stat are < -1.96 so are significant, there is significant evidence to reject null hypothesis. These time series are not random walks.
+
+## Time Series Process
+
+For each school, we will perform the following process.
+
+  1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
+  
+    - Seasonal Naive
+    - Simple Exponential Smoothing
+    - TSLM : Time Series Linear Model
+    - Holts Winters
+    - Auto Arima
+    - NNAR
+  
+  2. Find the best model for each school (comparing MAPE)
+  3. Using the entire dataset as training and the best model from the previous step, forecast statistics for the next year (52 weeks).
+
+The forecasts for each school will help determine how each school may rise or fall in popularity. 
