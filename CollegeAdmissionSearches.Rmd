@@ -118,3 +118,72 @@ For each school, we will perform the following process.
   3. Using the entire dataset as training and the best model from the previous step, forecast statistics for the next year (52 weeks).
 
 The forecasts for each school will help determine how each school may rise or fall in popularity. 
+
+## Time Series Process
+
+For each school, we will perform the following process.
+
+  1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
+  
+    - Seasonal Naive
+    - Simple Exponential Smoothing
+    - TSLM : Time Series Linear Model
+    - Holt-Winters
+    - Auto ARIMA
+    - Moving Average
+    - Holts Winters
+    - Auto Arima
+    - NNAR
+  
+  2. Find the best model for each school (comparing MAPE)
+  3. Using the entire dataset as training and the best model from the previous step, forecast statistics for the next year (52 weeks).
+
+The forecasts for each school will help determine how each school may rise or fall in popularity. 
+
+#### Train/Valid Split
+```{r, message = FALSE}
+nValid <- 52
+plots <- list()
+
+train_data <- list()
+valid_data <- list()
+
+for (i in 1:length(file_paths)) {
+  
+  college.ts <- data_sets[[i]]
+  
+  nTrain <- length(college.ts) - nValid
+  
+  train.ts <- window(college.ts, start = c(2020, 5), end = c(2020, nTrain))
+  valid.ts <- window(college.ts, start = c(2020, nTrain + 1), end = c(2020, nTrain + nValid))
+  
+  # create train/valid for each school
+  school <- sub("_.*", "", college_names[i])
+  
+  train_data[[school]] <- train.ts
+  valid_data[[school]] <- valid.ts
+  
+  p <- autoplot(train.ts) + 
+    autolayer(valid.ts) +
+    ggtitle(paste("Train Test Split: ", school))
+  
+  plots[[i]] <- p
+}
+
+plots
+```
+
+
+#### Seasonal Naive
+
+#### Simple Exponential Smoothing
+
+#### TSLM : Time Series Linear Model
+
+#### Moving Average
+
+#### Holts Winters
+
+#### Auto Arima
+
+#### NNAR
