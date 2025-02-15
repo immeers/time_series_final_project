@@ -174,16 +174,25 @@ plots
 ```
 
 
-#### Seasonal Naive
+#### Seasonal Naive - SC
+```{r}
 
-#### Simple Exponential Smoothing
+```
 
-#### TSLM : Time Series Linear Model
+#### Simple Exponential Smoothing - SC
+```{r}
 
-#### Moving Average
+```
 
-#### Holts Winters
+#### TSLM : Time Series Linear Model - SC
+```{r}
 
-#### Auto Arima
+```
 
-#### NNAR
+#### Moving Average - IM
+
+#### Holts Winters - IM
+
+#### Auto Arima - SD
+
+#### NNAR - SD
