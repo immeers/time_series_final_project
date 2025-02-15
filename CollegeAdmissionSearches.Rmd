@@ -110,8 +110,8 @@ For each school, we will perform the following process.
     - Seasonal Naive
     - Simple Exponential Smoothing
     - TSLM : Time Series Linear Model
-    - Holts Winters
-    - Auto Arima
+    - Holt-Winters
+    - Auto ARIMA
     - NNAR
   
   2. Find the best model for each school (comparing MAPE)
