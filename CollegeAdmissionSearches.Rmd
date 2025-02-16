@@ -34,6 +34,7 @@ library(forecast)
 library(readr)
 library(ggplot2)
 library(stringr)
+library(zoo)
 
 file_paths = Sys.glob(file.path("./data", "*"))
 data_sets = list()
@@ -147,6 +148,7 @@ plots <- list()
 
 train_data <- list()
 valid_data <- list()
+n_valid <- list()
 
 for (i in 1:length(file_paths)) {
   
@@ -162,6 +164,7 @@ for (i in 1:length(file_paths)) {
   
   train_data[[school]] <- train.ts
   valid_data[[school]] <- valid.ts
+  n_valid[[school]] <- nValid
   
   p <- autoplot(train.ts) + 
     autolayer(valid.ts) +
@@ -190,8 +193,43 @@ plots
 ```
 
 #### Moving Average - IM
+```{r}
+for (i in (1:length(file_paths))){
+  
+  college.ts = data_sets[[i]]
+
+  ma.trailing <- rollmean(college.ts, k = 12, align = "right") #zoo
+  ma.centered <- ma(college.ts, order = 12) #forecast
+  
+  g = autoplot(college.ts) +
+  autolayer(ma.trailing, series="Trailing MA")+
+  autolayer(ma.centered, series="Centered MA")+
+  geom_line(color = "black") + labs(title = college_names[i])
+  
+  print(g)
+  
+}
+```
 
 #### Holts Winters - IM
+```{r}
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+
+  hwin.mod <- ets(train.ts, model = "MAA")
+
+  # create predictions
+  hwin.pred <- forecast(hwin.mod, h = n_valid[[i]], level = 0)
+
+  g = autoplot(college.ts) +
+  autolayer(hwin.pred$mean, series = "Holt-Winters")+
+  geom_line(color = "black") + labs(title = college_names[i])
+  
+  print(g)
+  
+}
+```
 
 #### Auto Arima - SD
 
