@@ -165,7 +165,8 @@ for (i in 1:length(file_paths)) {
   
   p <- autoplot(train.ts) + 
     autolayer(valid.ts) +
-    ggtitle(paste("Train Test Split: ", school))
+    ggtitle(paste("Train Test Split: ", school))+
+    ylab("Interest")
   
   plots[[i]] <- p
 }
@@ -176,7 +177,10 @@ plots
 
 #### Seasonal Naive - SC
 ```{r}
-
+for (train in train_data) {
+  train_data[i]
+  snaive
+}
 ```
 
 #### Simple Exponential Smoothing - SC
