@@ -180,7 +180,7 @@ plots
 
 #### Seasonal Naive - SC
 ```{r}
-seasonal_naive_models = list()
+snaive_models = list()
 
 for (i in (1:length(file_paths))){
   
@@ -192,7 +192,7 @@ for (i in (1:length(file_paths))){
   
   # save to list
   school <- sub("_.*", "", college_names[i])
-  seasonal_naive_models[[school]] <- seasonal.naive.forecast
+  snaive_models[[school]] <- seasonal.naive.forecast
   
   p = autoplot(seasonal.naive.forecast, series = "Seasonal Naive") +
     autolayer(valid_data[[i]], series = "Observed") +
