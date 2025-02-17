@@ -9,7 +9,6 @@ subtitle: "Will the Top-Ranked Schools Change?"
 ---
 
 ## Objective
-What is the objective of performing time series forecasting and who would it benefit? 
 This analysis will forecast the number of Google Searches for admissions data of the top five nationally ranked U.S. universities. The current U.S. News rankings are as follows:
 
   1. Princeton University
@@ -59,7 +58,6 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-
 ```{r Check for random walk}
 for (i in (1:length(file_paths))){
   
@@ -70,10 +68,10 @@ for (i in (1:length(file_paths))){
   print(Acf(diff.ts, main = college_names[i]))
 }
 ```
+
 All ACF plots show significant correlation after differencing meaning these time series are not random walks.
 
 To further prove this, we will also perform hypothesis testing.
-
 ```{r}
 for (i in (1:length(file_paths))){
   
@@ -95,7 +93,6 @@ for (i in (1:length(file_paths))){
 We can conclude that all our coefficients are significantly different from 0. 
 
 Null Hypothesis: beta = 1 (i.e., random walk)
-
 Alternative Hypothesis: beta not equal to 1 (i.e., not random walk)
 
 To be specific, our t-stat = (coefficient - 1)/s.e = 
@@ -104,7 +101,6 @@ t-stat = +-/1.96 at 95% confidence interval
 All t-stat are < -1.96 so are significant, there is significant evidence to reject null hypothesis. These time series are not random walks.
 
 ## Time Series Process
-
 For each school, we will perform the following process.
 
   1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
@@ -113,25 +109,6 @@ For each school, we will perform the following process.
     - Simple Exponential Smoothing
     - TSLM : Time Series Linear Model
     - Holt-Winters
-    - Auto ARIMA
-    - NNAR
-  
-  2. Find the best model for each school (comparing MAPE)
-  3. Using the entire dataset as training and the best model from the previous step, forecast statistics for the next year (52 weeks).
-
-The forecasts for each school will help determine how each school may rise or fall in popularity. 
-
-## Time Series Process
-
-For each school, we will perform the following process.
-
-  1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
-  
-    - Seasonal Naive
-    - Simple Exponential Smoothing
-    - TSLM : Time Series Linear Model
-    - Holt-Winters
-    - Auto ARIMA
     - Moving Average
     - Holts Winters
     - Auto Arima
@@ -154,6 +131,9 @@ n_valid <- list()
 for (i in 1:length(file_paths)) {
   
   college.ts <- data_sets[[i]]
+  
+  # Zeros will affect training ability and MAPE calculations, so make these instances = 1.
+  college.ts[college.ts == 0] <- 1
   
   nTrain <- length(college.ts) - nValid
   
@@ -358,49 +338,34 @@ for (i in (1:length(file_paths))){
 #### Compare Models for Each School
 Using MAPE
 ```{r}
-mape_values = c()
+model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "NNAR")
 
 for (i in (1:length(file_paths))){
   
   snaive <- snaive_models[[i]]
   ses <- ses_models[[i]]
   tslm <- tslm_models[[i]]
-  hwin <- hwin_models[[i]]
   arima <- auto_arima_models[[i]]
-  ma_trailing <- moving_avg_trailing_models[[i]]
-  ma_centered <- moving_avg_centered_models[[i]]
+  #ma_trailing <- moving_avg_trailing_models[[i]]
+  #ma_centered <- moving_avg_centered_models[[i]]
   nnar <- nnar_models[[i]]
   
-  snaive_mape <- accuracy(snaive)["Test set", "MAPE"]
-  ses_mape <- accuracy(ses)["Test set", "MAPE"]
-  tslm_mape <- accuracy(tslm)["Test set", "MAPE"]
-  hwin_mape <- accuracy(hwin)["Test set", "MAPE"]
-  arima_mape <- accuracy(arima)["Test set", "MAPE"]
-  ma_trailing_mape <- accuracy(ma_trailing)["Test set", "MAPE"]
-  ma_centered_mape <- accuracy(ma_centered)["Test set", "MAPE"]
-  nnar_mape <- accuracy(nnar)["Test set", "MAPE"]
+  snaive_mape <- accuracy(snaive, valid_data[[i]])["Test set", "MAPE"]
+  ses_mape <- accuracy(ses, valid_data[[i]])["Test set", "MAPE"]
+  tslm_mape <- accuracy(tslm, valid_data[[i]])["Test set", "MAPE"]
+  arima_mape <- accuracy(arima, valid_data[[i]])["Test set", "MAPE"]
+  #ma_trailing_mape <- accuracy(ma_trailing, valid_data[[i]])["MAPE"]
+  #ma_centered_mape <- accuracy(ma_centered, valid_data[[i]])["MAPE"]
+  nnar_mape <- accuracy(nnar, valid_data[[i]])["Test set", "MAPE"]
   
+  mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, nnar_mape)
+  mape_df <- data.frame(Model = model_names, MAPE = mape_values)
   
-  mape_values <- c(mape_values, 
-                   snaive_mape, 
-                   ses_mape, 
-                   tslm_mape, 
-                   hwin_mape, 
-                   arima_mape, 
-                   ma_trailing_mape, 
-                   ma_centered_mape, 
-                   nnar_mape)
+  min_index <- which.min(mape_values)
+  best_model <- model_names[min_index]
+  
+  cat(paste(college_names[[i]], "best model:", best_model, "\n"))
 }
-
-model_names <- c("Snaive", "SES", "TSLM", "HWIN", "ARIMA", "MA Trailing", "MA Centered", "NNAR")
-
-best_model_index <- which.min(mape_values)
-
-best_model <- model_names[best_model_index]
-best_mape <- mape_values[best_model_index]
-
-cat("Best Model: ", best_model, "\n")
-cat("MAPE: ", best_mape, "\n")
 ```
 
 #### Forecast for entire period
