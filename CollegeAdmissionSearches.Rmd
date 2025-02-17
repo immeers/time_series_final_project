@@ -180,20 +180,29 @@ plots
 
 #### Seasonal Naive - SC
 ```{r}
-for (train in train_data) {
-  train_data[i]
-  snaive
-}
+seasonal.naive.forecast <- snaive(train.ts1, h = nValid)
 ```
 
 #### Simple Exponential Smoothing - SC
 ```{r}
-
+#Typically used for data that has no trend or seasonality
+ses <- ets(train.ts, model = "ANN", alpha = 0.5)
 ```
 
 #### TSLM : Time Series Linear Model - SC
 ```{r}
-
+#Linear Trend
+train.lm <- tslm(train.ts ~ trend)
+#Exponential Trend
+train.lm.expo.trend <- tslm(train.ts ~ trend, lambda = 0)
+#Quadratic Trend
+train.lm.poly.trend <- tslm(train.ts ~ trend + I(trend^2))
+#Additive Seasonality
+train.lm.season <- tslm(train.ts ~ season)
+#Additive Seasonality and Linear Trend
+train.lm.trend.season <- tslm(train.ts ~ trend + season)
+#Additive Seasonality and Quadratic Trend
+train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
 ```
 
 #### Moving Average - IM
