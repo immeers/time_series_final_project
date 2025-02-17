@@ -35,6 +35,7 @@ library(readr)
 library(ggplot2)
 library(stringr)
 library(zoo)
+library(Metrics)
 
 file_paths = Sys.glob(file.path("./data", "*"))
 data_sets = list()
@@ -177,16 +178,105 @@ for (i in 1:length(file_paths)) {
 plots
 ```
 
-
 #### Seasonal Naive - SC
 ```{r}
-seasonal.naive.forecast <- snaive(train.ts1, h = nValid)
+# Initialize lists to store models and MAPE values
+models <- list()
+mape_values <- list()
+
+for (i in 1:length(file_paths)) {
+  
+  # Existing code to split data into train/valid
+  college.ts <- data_sets[[i]]
+  nTrain <- length(college.ts) - nValid
+  train.ts <- window(college.ts, start = c(2020, 5), end = c(2020, nTrain))
+  valid.ts <- window(college.ts, start = c(2020, nTrain + 1), end = c(2020, nTrain + nValid))
+  
+  school <- sub("_.*", "", college_names[i])
+  train_data[[school]] <- train.ts
+  valid_data[[school]] <- valid.ts
+  n_valid[[school]] <- nValid
+  
+  # Fit a model (e.g., ARIMA, Exponential Smoothing, etc.)
+  model <- auto.arima(train.ts)  # Using auto.arima as an example
+  
+  # Save the model in the models list with the school name
+  models[[school]] <- model
+  
+  # Predict on validation set
+  forecast_values <- forecast(model, h = nValid)
+  
+  # Calculate MAPE (Mean Absolute Percentage Error)
+  mape_value <- mape(valid.ts, forecast_values$mean)
+  
+  # Save MAPE value in the mape_values list with the school name
+  mape_values[[school]] <- mape_value
+  
+  # Plot train vs valid data (unchanged from your original code)
+  p <- autoplot(train.ts) + 
+    autolayer(valid.ts) +
+    ggtitle(paste("Train Test Split: ", school)) +
+    ylab("Interest")
+  
+  plots[[i]] <- p
+}
+
+# Output the models and MAPE values
+models
+mape_values
+```
+```{r}
+seasonal.naive.forecast <- snaive(train.ts, h = nValid)
+
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+
+  seasonal.naive <- snaive(train.ts, h = nValid)
+
+  # create predictions
+  snaive.pred <- forecast(seasonal.naive, h = n_valid[[i]])
+  
+  mape_value <- mape(valid.ts, snaive.pred$mean)
+  mape_values[[school]] <- mape_value
+
+  g = autoplot(college.ts) +
+  autolayer(snaive.pred$mean, series = "Seasonal Naive")+
+  geom_line(color = "black") + labs(title = college_names[i])
+  
+  print(g)
+  
+}
+
+mape_values
 ```
 
 #### Simple Exponential Smoothing - SC
 ```{r}
 #Typically used for data that has no trend or seasonality
 ses <- ets(train.ts, model = "ANN", alpha = 0.5)
+
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+
+  ses <- ets(train.ts, model = "ANN", alpha = 0.5)
+
+  # create predictions
+  ses.pred <- forecast(ses, h = n_valid[[i]])
+  
+  mape_value <- mape(valid.ts, ses.pred$mean)
+  mape_values[[school]] <- mape_value
+
+  g = autoplot(college.ts) +
+  autolayer(snaive.pred$mean, series = "Simple Exponential Smoothing")+
+  geom_line(color = "black") + labs(title = college_names[i])
+  
+  print(g)
+  
+}
+
+mape_values
 ```
 
 #### TSLM : Time Series Linear Model - SC
