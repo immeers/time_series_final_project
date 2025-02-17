@@ -34,7 +34,6 @@ library(readr)
 library(ggplot2)
 library(stringr)
 library(zoo)
-library(Metrics)
 
 file_paths = Sys.glob(file.path("./data", "*"))
 data_sets = list()
@@ -48,12 +47,12 @@ for (i in (1:length(file_paths))){
   
   colnames(college.data) <- c("Week", "Searches")
   
-  college.ts <- ts(college.data$Searches, start = c(2020, 5), end = c(2025, 5), freq = 52) #weekly with a yearly season
+  college.ts <- ts(college.data$Searches, start = c(2020, 7), end = c(2025, 7), freq = 52) #weekly with a yearly season
   
   g = autoplot(college.ts) +
   geom_line(color = "black") + labs(title = college_names[i])
   
-  print(g)
+  #print(g)
   data_sets[[i]] <- college.ts
 }
 ```
@@ -122,7 +121,6 @@ The forecasts for each school will help determine how each school may rise or fa
 #### Train/Valid Split
 ```{r, message = FALSE}
 nValid <- 52
-plots <- list()
 
 train_data <- list()
 valid_data <- list()
@@ -137,7 +135,7 @@ for (i in 1:length(file_paths)) {
   
   nTrain <- length(college.ts) - nValid
   
-  train.ts <- window(college.ts, start = c(2020, 5), end = c(2020, nTrain))
+  train.ts <- window(college.ts, start = c(2020, 7), end = c(2020, nTrain))
   valid.ts <- window(college.ts, start = c(2020, nTrain + 1), end = c(2020, nTrain + nValid))
   
   # create train/valid for each school
@@ -152,10 +150,8 @@ for (i in 1:length(file_paths)) {
     ggtitle(paste("Train Test Split: ", school))+
     ylab("Interest")
   
-  plots[[i]] <- p
+  print(p)
 }
-
-plots
 ```
 
 #### Seasonal Naive - SC
@@ -242,10 +238,19 @@ for (i in (1:length(file_paths))){
   ma.trailing <- rollmean(college.ts, k = 12, align = "right") #zoo
   ma.centered <- ma(college.ts, order = 12) #forecast
   
+  last.ma.trailing <- tail(ma.trailing, 1) 
+  last.ma.centered <- tail(ma.centered, 1) 
+  
+  nTrain <- length(college.ts) - n_valid[[i]]
+  ma.trailing.pred <- ts(rep(last.ma.trailing, n_valid[[i]]), start = c(2020, nTrain + 1), 
+                       end = c(2020, nTrain + nValid), freq = 52)
+  ma.centered.pred <- ts(rep(last.ma.centered, n_valid[[i]]), start = c(2020, nTrain + 1), 
+                       end = c(2020, nTrain + nValid), freq = 52)
+  
    # save to list
   school <- sub("_.*", "", college_names[i])
-  moving_avg_trailing_models[[school]] <- ma.trailing
-  moving_avg_centered_models[[school]] <- ma.centered
+  moving_avg_trailing_models[[school]] <- ma.trailing.pred
+  moving_avg_centered_models[[school]] <- ma.centered.pred
   
   g = autoplot(college.ts) +
   autolayer(ma.trailing, series="Trailing MA")+
@@ -338,7 +343,7 @@ for (i in (1:length(file_paths))){
 #### Compare Models for Each School
 Using MAPE
 ```{r}
-model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "NNAR")
+model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "MA TRAILING", "MA CENTERED", "NNAR")
 
 for (i in (1:length(file_paths))){
   
@@ -346,25 +351,26 @@ for (i in (1:length(file_paths))){
   ses <- ses_models[[i]]
   tslm <- tslm_models[[i]]
   arima <- auto_arima_models[[i]]
-  #ma_trailing <- moving_avg_trailing_models[[i]]
-  #ma_centered <- moving_avg_centered_models[[i]]
+  ma_trailing <- moving_avg_trailing_models[[i]]
+  ma_centered <- moving_avg_centered_models[[i]]
   nnar <- nnar_models[[i]]
   
   snaive_mape <- accuracy(snaive, valid_data[[i]])["Test set", "MAPE"]
   ses_mape <- accuracy(ses, valid_data[[i]])["Test set", "MAPE"]
   tslm_mape <- accuracy(tslm, valid_data[[i]])["Test set", "MAPE"]
   arima_mape <- accuracy(arima, valid_data[[i]])["Test set", "MAPE"]
-  #ma_trailing_mape <- accuracy(ma_trailing, valid_data[[i]])["MAPE"]
-  #ma_centered_mape <- accuracy(ma_centered, valid_data[[i]])["MAPE"]
+  ma_trailing_mape <- accuracy(ma_trailing, valid_data[[i]])["MAPE"]
+  ma_centered_mape <- accuracy(ma_centered, valid_data[[i]])["MAPE"]
   nnar_mape <- accuracy(nnar, valid_data[[i]])["Test set", "MAPE"]
   
-  mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, nnar_mape)
+  mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, ma_trailing_mape, ma_centered_mape, nnar_mape)
   mape_df <- data.frame(Model = model_names, MAPE = mape_values)
   
   min_index <- which.min(mape_values)
   best_model <- model_names[min_index]
   
-  cat(paste(college_names[[i]], "best model:", best_model, "\n"))
+  school <- sub("_.*", "", college_names[[i]])
+  cat(paste(school, "best model:", best_model, "\n"))
 }
 ```
 
