@@ -297,12 +297,20 @@ train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
 
 #### Moving Average - IM
 ```{r}
+moving_avg_trailing_models = list()
+moving_avg_centered_models = list()
+
 for (i in (1:length(file_paths))){
   
   college.ts = data_sets[[i]]
 
   ma.trailing <- rollmean(college.ts, k = 12, align = "right") #zoo
   ma.centered <- ma(college.ts, order = 12) #forecast
+  
+   # save to list
+  school <- sub("_.*", "", college_names[i])
+  moving_avg_trailing_models[[school]] <- ma.trailing
+  moving_avg_centered_models[[school]] <- ma.centered
   
   g = autoplot(college.ts) +
   autolayer(ma.trailing, series="Trailing MA")+
@@ -316,6 +324,8 @@ for (i in (1:length(file_paths))){
 
 #### Holts Winters - IM
 ```{r}
+holt_winters_models = list()
+
 for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
@@ -324,6 +334,10 @@ for (i in (1:length(file_paths))){
 
   # create predictions
   hwin.pred <- forecast(hwin.mod, h = n_valid[[i]], level = 0)
+  
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  holt_winters_models[[school]] <- hwin.pred
 
   g = autoplot(college.ts) +
   autolayer(hwin.pred$mean, series = "Holt-Winters")+
@@ -335,5 +349,104 @@ for (i in (1:length(file_paths))){
 ```
 
 #### Auto Arima - SD
+```{r}
+auto_arima_models = list()
+
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+  
+  # create predictions
+  auto.arima <- auto.arima(train.ts)
+  arima.auto.forecast <- forecast(auto.arima, h = n_valid[[i]], level = 0)
+  
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  auto_arima_models[[school]] <- arima.auto.forecast
+  
+  p = autoplot(arima.auto.forecast, series = "Auto Arima") +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + labs(title = college_names[i])
+
+  print(p)
+}
+```
 
 #### NNAR - SD
+```{r}
+nnar_models = list()
+
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+  
+  # create predictions
+  p <- 12 # Number of previous time steps used for forecast
+  P <- 1 # Number of previous seasonal values to use 
+  size <- 7 # Number of hidden nodes 
+  
+  school.nnetar <- nnetar(train.ts, repeats = 20, p = p, P = P, size = size)
+  nnetar.forecast <- forecast(school.nnetar, h = n_valid[[i]])
+  
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  nnar_models[[school]] <- nnetar.forecast
+  
+  p = autoplot(nnetar.forecast, series = "NNAR") +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + labs(title = college_names[i])
+
+  print(p)
+}
+```
+
+#### Compare Models for Each School
+Using MAPE
+```{r}
+mape_values = c()
+
+for (i in (1:length(file_paths))){
+  
+  snaive <- snaive_models[[i]]
+  ses <- ses_models[[i]]
+  tslm <- tslm_models[[i]]
+  hwin <- hwin_models[[i]]
+  arima <- auto_arima_models[[i]]
+  ma_trailing <- moving_avg_trailing_models[[i]]
+  ma_centered <- moving_avg_centered_models[[i]]
+  nnar <- nnar_models[[i]]
+  
+  snaive_mape <- accuracy(snaive)["Test set", "MAPE"]
+  ses_mape <- accuracy(ses)["Test set", "MAPE"]
+  tslm_mape <- accuracy(tslm)["Test set", "MAPE"]
+  hwin_mape <- accuracy(hwin)["Test set", "MAPE"]
+  arima_mape <- accuracy(arima)["Test set", "MAPE"]
+  ma_trailing_mape <- accuracy(ma_trailing)["Test set", "MAPE"]
+  ma_centered_mape <- accuracy(ma_centered)["Test set", "MAPE"]
+  nnar_mape <- accuracy(nnar)["Test set", "MAPE"]
+  
+  
+  mape_values <- c(mape_values, 
+                   snaive_mape, 
+                   ses_mape, 
+                   tslm_mape, 
+                   hwin_mape, 
+                   arima_mape, 
+                   ma_trailing_mape, 
+                   ma_centered_mape, 
+                   nnar_mape)
+}
+
+model_names <- c("Snaive", "SES", "TSLM", "HWIN", "ARIMA", "MA Trailing", "MA Centered", "NNAR")
+
+best_model_index <- which.min(mape_values)
+
+best_model <- model_names[best_model_index]
+best_mape <- mape_values[best_model_index]
+
+cat("Best Model: ", best_model, "\n")
+cat("MAPE: ", best_mape, "\n")
+```
+
+#### Forecast for entire period
+
