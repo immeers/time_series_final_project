@@ -45,7 +45,7 @@ for (i in (1:length(file_paths))){
   
   college.data <- read_delim(file_paths[i], delim = ",", skip = 1)
   
-  college_names[i] = str_extract(string= file_paths[i], pattern = "[a-z]*_admission")
+  college_names[i] = str_extract(string= file_paths[i], pattern = "[a-z]*_admissions")
   
   colnames(college.data) <- c("Week", "Searches")
   
