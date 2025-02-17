@@ -180,119 +180,74 @@ plots
 
 #### Seasonal Naive - SC
 ```{r}
-# Initialize lists to store models and MAPE values
-models <- list()
-mape_values <- list()
-
-for (i in 1:length(file_paths)) {
-  
-  # Existing code to split data into train/valid
-  college.ts <- data_sets[[i]]
-  nTrain <- length(college.ts) - nValid
-  train.ts <- window(college.ts, start = c(2020, 5), end = c(2020, nTrain))
-  valid.ts <- window(college.ts, start = c(2020, nTrain + 1), end = c(2020, nTrain + nValid))
-  
-  school <- sub("_.*", "", college_names[i])
-  train_data[[school]] <- train.ts
-  valid_data[[school]] <- valid.ts
-  n_valid[[school]] <- nValid
-  
-  # Fit a model (e.g., ARIMA, Exponential Smoothing, etc.)
-  model <- auto.arima(train.ts)  # Using auto.arima as an example
-  
-  # Save the model in the models list with the school name
-  models[[school]] <- model
-  
-  # Predict on validation set
-  forecast_values <- forecast(model, h = nValid)
-  
-  # Calculate MAPE (Mean Absolute Percentage Error)
-  mape_value <- mape(valid.ts, forecast_values$mean)
-  
-  # Save MAPE value in the mape_values list with the school name
-  mape_values[[school]] <- mape_value
-  
-  # Plot train vs valid data (unchanged from your original code)
-  p <- autoplot(train.ts) + 
-    autolayer(valid.ts) +
-    ggtitle(paste("Train Test Split: ", school)) +
-    ylab("Interest")
-  
-  plots[[i]] <- p
-}
-
-# Output the models and MAPE values
-models
-mape_values
-```
-```{r}
-seasonal.naive.forecast <- snaive(train.ts, h = nValid)
+seasonal_naive_models = list()
 
 for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
-
-  seasonal.naive <- snaive(train.ts, h = nValid)
-
+  
   # create predictions
-  snaive.pred <- forecast(seasonal.naive, h = n_valid[[i]])
+  seasonal.naive <- snaive(train.ts, h = nValid, level = 0)
+  seasonal.naive.forecast <- forecast(seasonal.naive, h = n_valid[[i]], level = 0)
   
-  mape_value <- mape(valid.ts, snaive.pred$mean)
-  mape_values[[school]] <- mape_value
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  seasonal_naive_models[[school]] <- seasonal.naive.forecast
+  
+  p = autoplot(seasonal.naive.forecast, series = "Seasonal Naive") +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + labs(title = college_names[i])
 
-  g = autoplot(college.ts) +
-  autolayer(snaive.pred$mean, series = "Seasonal Naive")+
-  geom_line(color = "black") + labs(title = college_names[i])
-  
-  print(g)
-  
+  print(p)
 }
-
-mape_values
 ```
 
 #### Simple Exponential Smoothing - SC
 ```{r}
-#Typically used for data that has no trend or seasonality
-ses <- ets(train.ts, model = "ANN", alpha = 0.5)
+ses_models = list()
 
 for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
-
-  ses <- ets(train.ts, model = "ANN", alpha = 0.5)
-
+  
   # create predictions
-  ses.pred <- forecast(ses, h = n_valid[[i]])
+  ses <- ets(train.ts, model = "ANN", alpha = 0.5)
+  ses.forecast <- forecast(ses, h = n_valid[[i]], level = 0)
   
-  mape_value <- mape(valid.ts, ses.pred$mean)
-  mape_values[[school]] <- mape_value
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  ses_models[[school]] <- ses.forecast
+  
+  p = autoplot(ses.forecast, series = "Simple Exponential Smoothing") +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + labs(title = college_names[i])
 
-  g = autoplot(college.ts) +
-  autolayer(snaive.pred$mean, series = "Simple Exponential Smoothing")+
-  geom_line(color = "black") + labs(title = college_names[i])
-  
-  print(g)
-  
+  print(p)
 }
-
-mape_values
 ```
 
 #### TSLM : Time Series Linear Model - SC
 ```{r}
-#Linear Trend
-train.lm <- tslm(train.ts ~ trend)
-#Exponential Trend
-train.lm.expo.trend <- tslm(train.ts ~ trend, lambda = 0)
-#Quadratic Trend
-train.lm.poly.trend <- tslm(train.ts ~ trend + I(trend^2))
-#Additive Seasonality
-train.lm.season <- tslm(train.ts ~ season)
-#Additive Seasonality and Linear Trend
-train.lm.trend.season <- tslm(train.ts ~ trend + season)
-#Additive Seasonality and Quadratic Trend
-train.lm.trend.season <- tslm(train.ts ~ trend + I(trend^2) + season)
+tslm_models = list()
+
+for (i in (1:length(file_paths))){
+  
+  train.ts = train_data[[i]]
+  
+  # create predictions
+  tslm <- tslm(train.ts ~ trend + season)
+  tslm.forecast <- forecast(tslm, h = n_valid[[i]], level = 0)
+  
+  # save to list
+  school <- sub("_.*", "", college_names[i])
+  tslm_models[[school]] <- tslm.forecast
+  
+  p = autoplot(tslm.forecast, series = "Time Series Linear Model") +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + labs(title = college_names[i])
+
+  print(p)
+}
 ```
 
 #### Moving Average - IM
