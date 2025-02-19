@@ -416,7 +416,7 @@ Harvard: ETS
 ```{r, message = False}
 harvard.full <- stlf(data_sets[[1]])
 harvard.forecast <- forecast(harvard.full, h = 52)
-autoplot(harvard.forecast) + ggtitle("Harvard Forecast")
+autoplot(harvard.forecast) + ggtitle("Harvard Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[1], delim = ",", skip = 1)
@@ -435,10 +435,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - Harvard") +
+  ggtitle("Harvard's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
@@ -447,7 +447,7 @@ MIT: ARIMA
 ```{r, message = False}
 mit.full <- auto.arima(data_sets[[2]])
 mit.forecast <- forecast(mit.full, h = 52)
-autoplot(mit.forecast) + ggtitle("MIT Forecast")
+autoplot(mit.forecast) + ggtitle("MIT Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[2], delim = ",", skip = 1)
@@ -478,7 +478,7 @@ Notre Dame: SNAIVE
 ```{r, message = False}
 nd.full <- snaive(data_sets[[3]])
 nd.forecast <- forecast(nd.full, h = 52)
-autoplot(nd.forecast) + ggtitle("Notre Dame Forecast")
+autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[3], delim = ",", skip = 1)
@@ -509,7 +509,7 @@ Princeton: ETS
 ```{r, message = False}
 princeton.full <- stlf(data_sets[[4]])
 princeton.forecast <- forecast(princeton.full, h = 52)
-autoplot(princeton.forecast) + ggtitle("Princeton Forecast")
+autoplot(princeton.forecast) + ggtitle("Princeton Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[4], delim = ",", skip = 1)
@@ -540,7 +540,7 @@ Stanford: ARIMA
 ```{r, message = False}
 stanford.full <- auto.arima(data_sets[[5]])
 stanford.forecast <- forecast(stanford.full, h = 52)
-autoplot(stanford.forecast) + ggtitle("Stanford Forecast")
+autoplot(stanford.forecast) + ggtitle("Stanford Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[5], delim = ",", skip = 1)
@@ -571,7 +571,7 @@ Yale: ETS
 ```{r, message = False}
 yale.full <- stlf(data_sets[[6]])
 yale.forecast <- forecast(yale.full, h = 52)
-autoplot(yale.forecast) + ggtitle("Yale Forecast")
+autoplot(yale.forecast) + ggtitle("Yale Forecast") + ylab("Search Interest")
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[6], delim = ",", skip = 1)
