@@ -440,6 +440,11 @@ autoplot(princeton.forecast) + ggtitle("Princeton Forecast")
 ```
 
 Stanford: ARIMA
+```{r}
+stanford.full <- auto.arima(data_sets[[5]])
+stanford.forecast <- forecast(stanford.full, h = 52)
+autoplot(stanford.forecast) + ggtitle("Stanford Forecast")
+```
 
 Yale: ETS
 ```{r}
