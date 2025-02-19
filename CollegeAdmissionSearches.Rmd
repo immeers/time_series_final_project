@@ -34,6 +34,7 @@ library(readr)
 library(ggplot2)
 library(stringr)
 library(zoo)
+library(dplyr)
 
 file_paths = Sys.glob(file.path("./data", "*"))
 data_sets = list()
@@ -412,43 +413,187 @@ The datasets are stored as:
 A forecast for the next year will be created for each school using their respective best model from above.
   
 Harvard: ETS
-```{r}
+```{r, message = False}
 harvard.full <- stlf(data_sets[[1]])
 harvard.forecast <- forecast(harvard.full, h = 52)
 autoplot(harvard.forecast) + ggtitle("Harvard Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[1], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(harvard.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = harvard.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`harvard admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - Harvard") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
 MIT: ARIMA
-```{r}
+```{r, message = False}
 mit.full <- auto.arima(data_sets[[2]])
 mit.forecast <- forecast(mit.full, h = 52)
 autoplot(mit.forecast) + ggtitle("MIT Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[2], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(mit.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = mit.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`mit admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - MIT") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
 Notre Dame: SNAIVE
-```{r}
+```{r, message = False}
 nd.full <- snaive(data_sets[[3]])
 nd.forecast <- forecast(nd.full, h = 52)
 autoplot(nd.forecast) + ggtitle("Notre Dame Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[3], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(nd.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = nd.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`notre dame admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - Notre Dame") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
 Princeton: ETS
-```{r}
+```{r, message = False}
 princeton.full <- stlf(data_sets[[4]])
 princeton.forecast <- forecast(princeton.full, h = 52)
 autoplot(princeton.forecast) + ggtitle("Princeton Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[4], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(princeton.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = princeton.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`princeton admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - Princeton") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
 Stanford: ARIMA
-```{r}
+```{r, message = False}
 stanford.full <- auto.arima(data_sets[[5]])
 stanford.forecast <- forecast(stanford.full, h = 52)
 autoplot(stanford.forecast) + ggtitle("Stanford Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[5], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(stanford.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = stanford.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`stanford admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - Stanford") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
 Yale: ETS
-```{r}
+```{r, message = False}
 yale.full <- stlf(data_sets[[6]])
 yale.forecast <- forecast(yale.full, h = 52)
 autoplot(yale.forecast) + ggtitle("Yale Forecast")
+
+# Look at August 1 - January 1 (application period)
+college.data <- read_delim(file_paths[6], delim = ",", skip = 1)
+app.period <- college.data %>% 
+  filter(Week >= as.Date('2024-08-01') & Week <= as.Date('2025-01-01'))
+
+last_date <- tail(college.data$Week, 1)
+forecast.dates <- seq(from = last_date + 1, by = "week", length.out = length(yale.forecast$mean))
+forecast.data <- data.frame(Date = forecast.dates, Forecast = yale.forecast$mean)
+forecast.app.period <- forecast.data %>% 
+  filter(Date >= as.Date('2025-08-01') & Date <= as.Date('2026-01-01'))
+
+change <- forecast.app.period$Forecast - app.period$`yale admissions: (United States)`
+differences <- data.frame(Date = app.period$Week, Change = change)
+differences$Date <- as.Date(differences$Date)
+
+ggplot(differences, aes(x = Date, y = Change)) + 
+  geom_line() +
+  ggtitle("2025/26 Application Period Forecast - Yale") +
+  geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
+             linetype = "dashed", color = "red", size = 1) +
+  labs(x = "Date", y = "Change in Admissions") +
+  theme_minimal() +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
