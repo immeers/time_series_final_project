@@ -466,10 +466,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - MIT") +
+  ggtitle("MIT's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
@@ -497,10 +497,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - Notre Dame") +
+  ggtitle("Notre Dame's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
@@ -528,10 +528,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - Princeton") +
+  ggtitle("Princeton's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
@@ -559,10 +559,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - Stanford") +
+  ggtitle("Stanford's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
@@ -590,10 +590,10 @@ differences$Date <- as.Date(differences$Date)
 
 ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
-  ggtitle("2025/26 Application Period Forecast - Yale") +
+  ggtitle("Yale's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
-  labs(x = "Date", y = "Change in Admissions") +
+  labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
