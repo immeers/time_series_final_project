@@ -8,7 +8,7 @@ output:
 subtitle: "Will the Top-Ranked Schools Change?"
 ---
 
-## Objective
+## Introduction
 This analysis will forecast the number of Google Searches for admissions data of the top five nationally ranked U.S. universities. The current U.S. News rankings are as follows:
 
   1. Princeton University
@@ -25,7 +25,7 @@ It is likely that a school projected to see a spike in admissions search numbers
 
 The audience for this project are high school juniors and seniors, and admission counselors going through the college application process. These students can use the forecasted search numbers and possible ranking changes to determine which schools they should apply to and which may be more or less competitive in the next year. This project can be expanded to include any set of schools in which a person wants to apply. 
 
-## Initial Data Analysis
+## Initial Data Analysis & Visualization
 
 The first step in the time series process is to check if each dataset is a random walk. If so, this means that the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for the top 5 schools' data.
 ```{r, message=FALSE, warning =FALSE}
@@ -100,7 +100,7 @@ t-stat = +-/1.96 at 95% confidence interval
 
 All t-stat are < -1.96 so are significant, there is significant evidence to reject null hypothesis. These time series are not random walks.
 
-## Time Series Process
+## Time Series Process & Forecasting Models
 For each school, we will perform the following process.
 
   1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
@@ -405,7 +405,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### Forecast for entire period
+## Forecasting: Future Values
 The datasets are stored as:
 
   1: harvard, 2: mit, 3; nd, 4: princeton, 5: stanford, 6: yale
@@ -597,3 +597,11 @@ ggplot(differences, aes(x = Date, y = Change)) +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
+
+## Conclusion 
+
+
+## Reference
+
+
+## Appendix
