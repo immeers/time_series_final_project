@@ -17,9 +17,15 @@ This analysis will forecast the number of Google Searches for admissions data of
   4. Stanford University
   5. Yale University
 
-Data was obtained from Google Search statistics for each school; the search terms are "[school name] admission." Each dataset contains two columns: the date and the number of searches for the term. These are weekly time series with five years of data.
+Data was obtained from Google Search statistics for each school; the search terms are "[school name] admission." Each dataset contains two columns: the date and interest for the term. These are weekly time series with five years of data.
 
-Time-series analysis will be performed to identify trends and seasonality in each dataset. Following, a forecast will predict future weekly search amounts. Doing so will determine if specific schools are projected to rise or fall in popularity. 
+The interest column is not a total number of searches. Instead, the values represent search interest relative to the maximum in the five year period. Values for interest are scaled to range from zero to one hundred. 
+
+Time-series analysis will be performed to identify trends and seasonality in each dataset. Following, a forecast will predict future weekly search amounts. Doing so will determine if specific schools are projected to rise or fall in popularity. The analysis will answer the following questions:
+
+  1. How can each dataset be represented in a time series format?
+  2. Is a school projected to have more/less relative searches than the current year?
+  3. If so, when during the application cycle will these changes take place?
 
 It is likely that a school projected to see a spike in admissions search numbers in the next year, may have an increase in the number of applications, and thus the difficulty of admission. This would be useful information to determine changes in admission rate and exclusivity of schools in the future.
 
@@ -27,7 +33,7 @@ The audience for this project are high school juniors and seniors, and admission
 
 ## Initial Data Analysis & Visualization
 
-The first step in the time series process is to check if each dataset is a random walk. If so, this means that the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for the top 5 schools' data.
+The first step in the time series process is to check if each dataset is a random walk. If so, this means that the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for all schools' data.
 ```{r, message=FALSE, warning =FALSE}
 library(forecast)
 library(readr)
@@ -103,7 +109,7 @@ All t-stat are < -1.96 so are significant, there is significant evidence to reje
 ## Time Series Process & Forecasting Models
 For each school, we will perform the following process.
 
-  1. Determine the best time time series for the data. Validation data will be the last 52 weeks (one year).
+  1. Determine the best time time series for the data.
   
     - Seasonal Naive
     - Simple Exponential Smoothing
@@ -111,6 +117,7 @@ For each school, we will perform the following process.
     - Holt-Winters
     - Moving Average
     - Holts Winters
+    - Exponential Smoothing (ETS)
     - Auto Arima
     - NNAR
   
@@ -120,6 +127,7 @@ For each school, we will perform the following process.
 The forecasts for each school will help determine how each school may rise or fall in popularity. 
 
 #### Train/Valid Split
+Validation data will be the last 52 weeks (one year).
 ```{r, message = FALSE}
 nValid <- 52
 
@@ -155,7 +163,9 @@ for (i in 1:length(file_paths)) {
 }
 ```
 
-#### Seasonal Naive - SC
+All models listed above will be created for each schools' data.
+
+#### (1) Seasonal Naive
 ```{r}
 snaive_models = list()
 
@@ -179,7 +189,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### Simple Exponential Smoothing - SC
+#### (2) Simple Exponential Smoothing
 ```{r}
 ses_models = list()
 
@@ -203,7 +213,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### TSLM : Time Series Linear Model - SC
+#### (3) TSLM : Time Series Linear Model
 ```{r}
 tslm_models = list()
 
@@ -227,7 +237,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### Moving Average - IM
+#### (4) Moving Average
 ```{r}
 moving_avg_trailing_models = list()
 moving_avg_centered_models = list()
@@ -263,7 +273,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### Holts Winters - IM
+#### (5) Holts Winters
 Holts Winters is not able to handle a frequency higher than 24. The dataset for analysis has a frequency of 52 (weekly).
 ```{r, eval = FALSE}
 holt_winters_models = list()
@@ -290,8 +300,8 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### ETS
-For a frequency higher than 24, it is recommended to use STLF, which implicity uses an ETS model.
+#### (6) ETS/STLF
+For a frequency higher than 24, it is recommended to use Seasonal and Trend Decomposition with Loess (STLF), which implicity uses an ETS model.
 ```{r}
 ets_models = list()
 
@@ -317,7 +327,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### Auto Arima - SD
+#### (7) Auto Arima
 ```{r}
 auto_arima_models = list()
 
@@ -341,7 +351,7 @@ for (i in (1:length(file_paths))){
 }
 ```
 
-#### NNAR - SD
+#### (8) NNAR
 ```{r}
 nnar_models = list()
 
@@ -369,8 +379,10 @@ for (i in (1:length(file_paths))){
 }
 ```
 
+All models have been created and stored for each school. Models will now be compared using MAPE values.
+
 #### Compare Models for Each School
-Using MAPE
+Mean Absolute Percentage Error (MAPE) calculates the percentage error for the models on the validation data. For each school, the model with the lowest MAPE is the model that fit the data best.
 ```{r}
 model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "MA TRAILING", "MA CENTERED", "NNAR", "ETS")
 
@@ -410,7 +422,7 @@ The datasets are stored as:
 
   1: harvard, 2: mit, 3; nd, 4: princeton, 5: stanford, 6: yale
 
-A forecast for the next year will be created for each school using their respective best model from above.
+A forecast for the next year will be created for each school using their respective best model from above. Then, the forecasted values will be compared to the values from the current year (forecast - current). A positive value represents a forecasted increase for 2025/26.
   
 Harvard: ETS
 ```{r, message = False}
