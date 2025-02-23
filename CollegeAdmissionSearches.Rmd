@@ -419,7 +419,7 @@ All models have been created and stored for each school. Models will now be comp
 #### Compare Models for Each School
 Mean Absolute Percentage Error (MAPE) calculates the percentage error for the models on the validation data. For each school, the model with the lowest MAPE is the model that fit the data best.
 ```{r}
-model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "MA TRAILING", "MA CENTERED", "NNAR", "ETS", "WAVE")
+model_names <- c("SNAIVE", "SES", "TSLM", "ARIMA", "MA TRAILING", "NNAR", "ETS", "WAVE")
 
 for (i in (1:length(file_paths))){
   
@@ -428,7 +428,6 @@ for (i in (1:length(file_paths))){
   tslm <- tslm_models[[i]]
   arima <- auto_arima_models[[i]]
   ma_trailing <- moving_avg_trailing_models[[i]]
-  ma_centered <- moving_avg_centered_models[[i]]
   nnar <- nnar_models[[i]]
   ets <- ets_models[[i]]
   wave <- wave_models[[i]]
@@ -438,12 +437,11 @@ for (i in (1:length(file_paths))){
   tslm_mape <- accuracy(tslm, valid_data[[i]])["Test set", "MAPE"]
   arima_mape <- accuracy(arima, valid_data[[i]])["Test set", "MAPE"]
   ma_trailing_mape <- accuracy(ma_trailing, valid_data[[i]])["MAPE"]
-  ma_centered_mape <- accuracy(ma_centered, valid_data[[i]])["MAPE"]
   nnar_mape <- accuracy(nnar, valid_data[[i]])["Test set", "MAPE"]
   ets_mape <- accuracy(ets, valid_data[[i]])["Test set", "MAPE"]
   wave_mape <- accuracy(wave, valid_data[[i]])["Test set", "MAPE"]
   
-  mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, ma_trailing_mape, ma_centered_mape, nnar_mape, ets_mape, wave_mape)
+  mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, ma_trailing_mape, nnar_mape, ets_mape, wave_mape)
   mape_df <- data.frame(Model = model_names, MAPE = mape_values)
   
   school <- sub("_.*", "", college_names[[i]])
@@ -464,9 +462,9 @@ The datasets are stored as:
 
 A forecast for the next year will be created for each school using their respective best model from above. Then, the forecasted values will be compared to the values from the current year (forecast - current). A positive value represents a forecasted increase for 2025/26.
   
-Harvard: ETS
+Harvard: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
-harvard.full <- stlf(data_sets[[1]])
+harvard.full <- tslm(data_sets[[1]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 harvard.forecast <- forecast(harvard.full, h = 52)
 autoplot(harvard.forecast) + ggtitle("Harvard Forecast") + ylab("Search Interest")
 
@@ -526,9 +524,8 @@ ggplot(differences, aes(x = Date, y = Change)) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
-Notre Dame: WAVE
+Notre Dame: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
-#nd.full <- snaive(data_sets[[3]])
 nd.full <- tslm(data_sets[[3]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 nd.forecast <- forecast(nd.full, h = 52)
 autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
@@ -558,9 +555,9 @@ ggplot(differences, aes(x = Date, y = Change)) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
-Princeton: ETS
+Princeton: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
-princeton.full <- stlf(data_sets[[4]])
+princeton.full <- tslm(data_sets[[4]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 princeton.forecast <- forecast(princeton.full, h = 52)
 autoplot(princeton.forecast) + ggtitle("Princeton Forecast") + ylab("Search Interest")
 
