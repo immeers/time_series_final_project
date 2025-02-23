@@ -526,9 +526,10 @@ ggplot(differences, aes(x = Date, y = Change)) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 ```
 
-Notre Dame: SNAIVE
+Notre Dame: WAVE
 ```{r, message = False}
-nd.full <- snaive(data_sets[[3]])
+#nd.full <- snaive(data_sets[[3]])
+nd.full <- tslm(data_sets[[3]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 nd.forecast <- forecast(nd.full, h = 52)
 autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
 
