@@ -489,6 +489,7 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("Harvard's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
@@ -520,6 +521,8 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("MIT's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
+
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
@@ -551,6 +554,8 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("Notre Dame's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
+
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
@@ -582,6 +587,7 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("Princeton's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
@@ -613,6 +619,8 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("Stanford's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
+
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
@@ -644,6 +652,8 @@ ggplot(differences, aes(x = Date, y = Change)) +
   ggtitle("Yale's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
+  geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
+
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
