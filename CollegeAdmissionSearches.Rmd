@@ -515,7 +515,7 @@ change_plots[[1]] = ggplot(differences, aes(x = Date, y = Change)) +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
@@ -553,7 +553,7 @@ change_plots[[2]] = ggplot(differences, aes(x = Date, y = Change)) +
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
 
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
@@ -591,7 +591,7 @@ change_plots[[3]] = ggplot(differences, aes(x = Date, y = Change)) +
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
 
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
@@ -627,7 +627,7 @@ change_plots[[4]] = ggplot(differences, aes(x = Date, y = Change)) +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
@@ -664,7 +664,7 @@ change_plots[[5]] = ggplot(differences, aes(x = Date, y = Change)) +
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
 
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
@@ -701,7 +701,7 @@ change_plots[[6]] = ggplot(differences, aes(x = Date, y = Change)) +
              linetype = "dashed", color = "red", size = 1) +
   geom_hline(yintercept = 0, linetype = "solid", color = "blue") +
 
-  labs(x = "Date", y = "Change in Search Interest") +
+  labs(x = "Date", y = "Change") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
 
