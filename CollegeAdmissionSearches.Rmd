@@ -133,11 +133,13 @@ Validation data will be the last 52 weeks (one year).
 
 Pre-processing steps include changes values of 0 to 1. Doing so will allow for the calculation of MAPE values. This change will keep these values still relatively low within the range of the time series values. 
 ```{r, message = FALSE}
+library(gridExtra)
 nValid <- 52
 
 train_data <- list()
 valid_data <- list()
 n_valid <- list()
+p_list <- list()
 
 for (i in 1:length(file_paths)) {
   
@@ -163,8 +165,11 @@ for (i in 1:length(file_paths)) {
     ggtitle(paste("Train Test Split: ", school))+
     ylab("Interest")
   
-  print(p)
+  p_list[[i]] = p
 }
+
+grid.arrange(p_list[[1]], p_list[[2]], p_list[[3]], p_list[[4]], p_list[[5]], p_list[[6]], ncol = 2)
+
 ```
 
 All models listed above will be created for each schools' data.
@@ -451,12 +456,30 @@ for (i in (1:length(file_paths))){
   
   min_index <- which.min(mape_values)
   best_model <- model_names[min_index]
+  if (i == 1){
+    plot = data.frame(school = school, Model = best_model, MAPE = mape_values[min_index])
+  } else{
+    plot <- rbind.data.frame(plot, c(school, best_model, mape_values[min_index]))
+  }
+  
   
   cat(paste(school, "best model:", best_model, "\n"))
 }
 ```
+```{r}
+plot$MAPE =as.numeric(plot$MAPE)
+# Assuming your data frame is named 'plot'
+ggplot(data = plot, aes(x = school, y = MAPE)) + 
+  geom_bar(stat = "identity")
+```
 
 ## Forecasting: Future Values
+
+```{r}
+best_plots = list()
+change_plots = list()
+```
+
 The datasets are stored as:
 
   1: harvard, 2: mit, 3; nd, 4: princeton, 5: stanford, 6: yale
@@ -467,7 +490,9 @@ Harvard: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
 harvard.full <- tslm(data_sets[[1]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 harvard.forecast <- forecast(harvard.full, h = 52)
-autoplot(harvard.forecast) + ggtitle("Harvard Forecast") + ylab("Search Interest")
+best_plots[[1]] = autoplot(harvard.forecast) + ggtitle("Harvard Forecast") + ylab("Search Interest")
+
+print(best_plots[[1]])
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[1], delim = ",", skip = 1)
@@ -484,7 +509,7 @@ change <- forecast.app.period$Forecast - app.period$`harvard admissions: (United
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[1]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("Harvard's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -493,13 +518,18 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+
+print(change_plots[[1]])
 ```
 
 MIT: ARIMA
 ```{r, message = False}
 mit.full <- auto.arima(data_sets[[2]])
 mit.forecast <- forecast(mit.full, h = 52)
-autoplot(mit.forecast) + ggtitle("MIT Forecast") + ylab("Search Interest")
+best_plots[[2]] = autoplot(mit.forecast) + ggtitle("MIT Forecast") + ylab("Search Interest")
+
+print(best_plots[[2]])
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[2], delim = ",", skip = 1)
@@ -516,7 +546,7 @@ change <- forecast.app.period$Forecast - app.period$`mit admissions: (United Sta
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[2]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("MIT's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -526,14 +556,19 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+
+print(change_plots[[2]])
 ```
 
 Notre Dame: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
 nd.full <- tslm(data_sets[[3]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 nd.forecast <- forecast(nd.full, h = 52)
-autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
+best_plots[[3]] = autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
 
+
+print(best_plots[[3]])
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[3], delim = ",", skip = 1)
 app.period <- college.data %>% 
@@ -549,7 +584,7 @@ change <- forecast.app.period$Forecast - app.period$`notre dame admissions: (Uni
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[3]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("Notre Dame's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -559,13 +594,17 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+print(change_plots[[3]])
 ```
 
 Princeton: Sine/Cosine Encoding (Wave)
 ```{r, message = False}
 princeton.full <- tslm(data_sets[[4]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
 princeton.forecast <- forecast(princeton.full, h = 52)
-autoplot(princeton.forecast) + ggtitle("Princeton Forecast") + ylab("Search Interest")
+best_plots[[4]] = autoplot(princeton.forecast) + ggtitle("Princeton Forecast") + ylab("Search Interest")
+
+print(best_plots[[4]])
 
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[4], delim = ",", skip = 1)
@@ -582,7 +621,7 @@ change <- forecast.app.period$Forecast - app.period$`princeton admissions: (Unit
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[4]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("Princeton's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -591,14 +630,18 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+print(change_plots[[4]])
 ```
 
 Stanford: ARIMA
 ```{r, message = False}
 stanford.full <- auto.arima(data_sets[[5]])
 stanford.forecast <- forecast(stanford.full, h = 52)
-autoplot(stanford.forecast) + ggtitle("Stanford Forecast") + ylab("Search Interest")
+best_plots[[5]] = autoplot(stanford.forecast) + ggtitle("Stanford Forecast") + ylab("Search Interest")
 
+
+print(best_plots[[5]])
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[5], delim = ",", skip = 1)
 app.period <- college.data %>% 
@@ -614,7 +657,7 @@ change <- forecast.app.period$Forecast - app.period$`stanford admissions: (Unite
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[5]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("Stanford's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -624,14 +667,18 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+print(change_plots[[5]])
 ```
 
 Yale: ETS
 ```{r, message = False}
 yale.full <- stlf(data_sets[[6]])
 yale.forecast <- forecast(yale.full, h = 52)
-autoplot(yale.forecast) + ggtitle("Yale Forecast") + ylab("Search Interest")
+best_plots[[6]] = autoplot(yale.forecast) + ggtitle("Yale Forecast") + ylab("Search Interest")
 
+
+print(best_plots[[6]])
 # Look at August 1 - January 1 (application period)
 college.data <- read_delim(file_paths[6], delim = ",", skip = 1)
 app.period <- college.data %>% 
@@ -647,7 +694,7 @@ change <- forecast.app.period$Forecast - app.period$`yale admissions: (United St
 differences <- data.frame(Date = app.period$Week, Change = change)
 differences$Date <- as.Date(differences$Date)
 
-ggplot(differences, aes(x = Date, y = Change)) + 
+change_plots[[6]] = ggplot(differences, aes(x = Date, y = Change)) + 
   geom_line() +
   ggtitle("Yale's Next Application Cycle - 2025/26") +
   geom_vline(xintercept = as.Date(c('2024-11-01', '2025-01-01')), 
@@ -657,17 +704,38 @@ ggplot(differences, aes(x = Date, y = Change)) +
   labs(x = "Date", y = "Change in Search Interest") +
   theme_minimal() +
   scale_x_date(date_breaks = "1 month", date_labels = "%b")
+
+print(change_plots[[6]])
+```
+```{r}
+grid.arrange(best_plots[[1]], best_plots[[2]], best_plots[[3]], best_plots[[4]], best_plots[[5]], best_plots[[6]], ncol = 2)
+
+```
+```{r}
+
+grid.arrange(change_plots[[1]], change_plots[[2]], change_plots[[3]], change_plots[[4]], change_plots[[5]], change_plots[[6]], ncol = 2)
 ```
 
+
 ## Conclusion 
+
 The time series forecasting above provided a predictive analysis of admissions search interest for 6 universities: Harvard University, MIT, University of Notre Dame, Princeton University, Stanford University, and Yale University. The resultant outcomes are to follow.
 
-  1. Harvard
-  2. MIT
-  3. Notre Dame
-  4. Princeton
-  5. Stanford
-  6. Yale
+For the following schools we would expect to have a positive change in number of searches for admissions and thus increase popularity, competitiveness and ranking.
+
+  - Stanford
+  - MIT
+  
+For the following schools we would expect to have a negative change in number of searches for admissions and thus decrease popularity, competitiveness and ranking. 
+
+  - Harvard
+  - Notre Dame
+  - Princeton
+  - Yale
+
+## Recommendations and Further Application
+
+We would recommend that high-achieving high schoolers apply to one of the "positive" schools and one of the "negative" schools if they are looking to get into these top institutions. This way you are covering your basis, with a reach and a target school (relatively!) A further application would be to forecast to the date that you are likely to graduate, as this is when ranking will be most important, and choose a school that would be less competitive at admission but more competitive at graduation.
 
 ## References
 
