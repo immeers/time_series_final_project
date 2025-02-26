@@ -112,7 +112,7 @@ for (i in (1:length(file_paths))){
 ```
 
 ```{r}
-random_walk_test <- data.frame("AR1_Coeff" = ar, "S.E" = se, "T_Stat" = t_stat, "Significant" = -1.96 > t_stat)
+random_walk_test <- data.frame("School" = unlist(college_names), "AR1_Coeff" = ar, "S.E" = se, "T_Stat" = t_stat, "Significant" = -1.96 > t_stat)
 random_walk_test
 ```
 
@@ -466,11 +466,13 @@ for (i in (1:length(file_paths))){
   wave_mape <- accuracy(wave, valid_data[[i]])["Test set", "MAPE"]
   
   mape_values <- c(snaive_mape, ses_mape, tslm_mape, arima_mape, ma_trailing_mape, nnar_mape, ets_mape, wave_mape)
-  mape_df <- data.frame(Model = model_names, MAPE = mape_values)
   
   school <- sub("_.*", "", college_names[[i]])
-  #print(school)
-  #print(mape_df)
+  col_name <- paste(school, "Model", sep = " ")
+  mape_df <- data.frame(Model = model_names, MAPE = mape_values)
+  names(mape_df)[1] <- col_name
+  
+  print(mape_df)
   
   min_index <- which.min(mape_values)
   best_model <- model_names[min_index]
