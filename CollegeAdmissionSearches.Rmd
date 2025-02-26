@@ -41,6 +41,8 @@ library(ggplot2)
 library(stringr)
 library(zoo)
 library(dplyr)
+library(gridExtra)
+library(grid)
 
 file_paths = Sys.glob(file.path("./data", "*"))
 data_sets = list()
@@ -67,20 +69,28 @@ for (i in (1:length(file_paths))){
 #### Evaluating Predictability
 The first step in the time series process is to check if each dataset is a random walk. If so, this means that the best possible forecast for this dataset is a naive forecast and there is no need to apply any modelling. The following code does so for all schools' data.
 ```{r Check for random walk}
+acf_plots <- list()
+
 for (i in (1:length(file_paths))){
   
   college.ts = data_sets[[i]]
 
   diff.ts <- diff(college.ts)
+  acf_plots[[i]] <- Acf(diff.ts, main = college_names[i])
   
-  print(Acf(diff.ts, main = college_names[i]))
+  print(acf_plots[[i]])
 }
 ```
+
 
 All ACF plots show significant correlation after differencing meaning these time series are not random walks.
 
 To further prove this, we will also perform hypothesis testing.
 ```{r}
+ar <- numeric(6)  
+se <- numeric(6)
+t_stat <- numeric(6)
+
 for (i in (1:length(file_paths))){
   
   college.ts = data_sets[[i]]
@@ -93,9 +103,17 @@ for (i in (1:length(file_paths))){
   ar1_intercept <- summary(college.ar.1)$coef["ar1"]
   ar1_se <- sqrt(diag(college.ar.1$var.coef))['ar1']
   
+  ar[i] <- ar1_intercept
+  se[i] <- ar1_se
+  t_stat[i] <- (ar1_intercept-1)/ar1_se
+  
   print(paste("Is significant?" , -1.96 > (ar1_intercept-1)/ar1_se))
 }
+```
 
+```{r}
+random_walk_test <- data.frame("AR1_Coeff" = ar, "S.E" = se, "T_Stat" = t_stat, "Significant" = -1.96 > t_stat)
+random_walk_test
 ```
 
 We can conclude that all our coefficients are significantly different from 0. 
@@ -466,6 +484,8 @@ for (i in (1:length(file_paths))){
   cat(paste(school, "best model:", best_model, "\n"))
 }
 ```
+
+
 ```{r}
 plot$MAPE =as.numeric(plot$MAPE)
 # Assuming your data frame is named 'plot'
@@ -473,8 +493,9 @@ ggplot(data = plot, aes(x = school, y = MAPE)) +
   geom_bar(stat = "identity")
 ```
 
-## Forecasting: Future Values
 
+
+## Forecasting: Future Values
 ```{r}
 best_plots = list()
 change_plots = list()
@@ -707,12 +728,15 @@ change_plots[[6]] = ggplot(differences, aes(x = Date, y = Change)) +
 
 print(change_plots[[6]])
 ```
+
+Forecast Plots
 ```{r}
 grid.arrange(best_plots[[1]], best_plots[[2]], best_plots[[3]], best_plots[[4]], best_plots[[5]], best_plots[[6]], ncol = 2)
 
 ```
-```{r}
 
+Forecast Change Plots
+```{r}
 grid.arrange(change_plots[[1]], change_plots[[2]], change_plots[[3]], change_plots[[4]], change_plots[[5]], change_plots[[6]], ncol = 2)
 ```
 
