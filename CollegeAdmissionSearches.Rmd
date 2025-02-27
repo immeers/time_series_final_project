@@ -201,8 +201,11 @@ for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
   
+  # need to remove trend (lag1) + seasonality (lag52)
+  diff.twice.train.ts <- diff(diff(train.ts, lag = 52), lag = 1)
+  
   # create predictions
-  seasonal.naive <- snaive(train.ts, h = nValid, level = 0)
+  seasonal.naive <- snaive(diff.twice.train.ts, h = nValid, level = 0)
   seasonal.naive.forecast <- forecast(seasonal.naive, h = n_valid[[i]], level = 0)
   
   # save to list
@@ -226,8 +229,11 @@ for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
   
+  # need to remove trend (lag1) + seasonality (lag52)
+  diff.twice.train.ts <- diff(diff(train.ts, lag = 52), lag = 1)
+  
   # create predictions
-  ses <- ets(train.ts, model = "ANN", alpha = 0.5)
+  ses <- ets(diff.twice.train.ts, model = "ANN", alpha = 0.5)
   ses.forecast <- forecast(ses, h = n_valid[[i]], level = 0)
   
   # save to list
