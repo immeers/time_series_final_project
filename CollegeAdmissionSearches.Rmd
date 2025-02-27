@@ -201,11 +201,8 @@ for (i in (1:length(file_paths))){
   
   train.ts = train_data[[i]]
   
-  # need to remove trend (lag1) + seasonality (lag52)
-  diff.twice.train.ts <- diff(diff(train.ts, lag = 52), lag = 1)
-  
   # create predictions
-  seasonal.naive <- snaive(diff.twice.train.ts, h = nValid, level = 0)
+  seasonal.naive <- snaive(train.ts, h = nValid, level = 0)
   seasonal.naive.forecast <- forecast(seasonal.naive, h = n_valid[[i]], level = 0)
   
   # save to list
@@ -590,10 +587,16 @@ change_plots[[2]] = ggplot(differences, aes(x = Date, y = Change)) +
 print(change_plots[[2]])
 ```
 
-Notre Dame: Sine/Cosine Encoding (Wave)
+Notre Dame: Simple Exponential Smoothing
 ```{r, message = False}
-nd.full <- tslm(data_sets[[3]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
-nd.forecast <- forecast(nd.full, h = 52)
+#nd.full <- tslm(data_sets[[3]] ~ season + I(sin(2*pi*trend/52)) + I(cos(2*pi*trend/52)))
+#nd.forecast <- forecast(nd.full, h = 52)
+
+# need to remove trend (lag1) + seasonality (lag52)
+nd.full <- diff(diff(data_sets[[3]], lag = 52), lag = 1)
+nd.ses <- ets(nd.full, model = "ANN", alpha = 0.5)
+nd.forecast <- forecast(nd.ses, h = 52)
+
 best_plots[[3]] = autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
 
 
