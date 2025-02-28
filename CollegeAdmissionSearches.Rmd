@@ -593,11 +593,12 @@ Notre Dame: Simple Exponential Smoothing
 #nd.forecast <- forecast(nd.full, h = 52)
 
 # need to remove trend (lag1) + seasonality (lag52)
-nd.full <- diff(diff(data_sets[[3]], lag = 52), lag = 1)
-nd.ses <- ets(nd.full, model = "ANN", alpha = 0.5)
+nd.full <- data_sets[[3]]
+nd.full.diff <- diff(diff(nd.full, lag = 52), lag = 1)
+nd.ses <- ets(nd.full.diff, model = "ANN", alpha = 0.5)
 nd.forecast <- forecast(nd.ses, h = 52)
 
-best_plots[[3]] = autoplot(nd.forecast) + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
+best_plots[[3]] = autoplot(nd.forecast) + autolayer(nd.full, series = "Series Pre-Differencing") + ggtitle("Notre Dame Forecast") + ylab("Search Interest")
 
 
 print(best_plots[[3]])
