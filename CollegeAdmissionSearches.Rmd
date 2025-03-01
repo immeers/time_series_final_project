@@ -265,8 +265,36 @@ for (i in 1:length(file_paths)) {
   
   print(p)
 }
-
 ```
+
+```{r, eval=FALSE}
+ses_models = list()
+
+for (i in 1:length(file_paths)) {
+  
+  train.ts = train_data[[i]]
+  school <- sub("_.*", "", college_names[i])
+
+  school_mape_values <- c()
+
+  for (alpha_value in seq(0.1, 0.9, by = 0.1)) {
+    
+    diff.twice.train.ts <- diff(diff(train.ts, lag = 52), lag = 1)
+    
+    ses <- ets(diff.twice.train.ts, model = "ANN", alpha = alpha_value)
+    ses.forecast <- forecast(ses, h = n_valid[[i]], level = 0)
+    
+    ses_models[[paste(school, "alpha", alpha_value, sep = "_")]] <- ses.forecast
+    
+    ses_mape <- accuracy(ses.forecast, valid_data[[i]])["Test set", "MAPE"]
+    
+    school_mape_values <- c(school_mape_values, ses_mape)
+    
+    cat(paste("MAPE for", school, "with alpha =", alpha_value, ": ", ses_mape, "\n"))
+  }
+}
+```
+
 
 #### (3) TSLM : Time Series Linear Model
 ```{r}
