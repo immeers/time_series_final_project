@@ -234,6 +234,40 @@ for (i in (1:length(file_paths))){
 }
 ```
 
+```{r}
+ses_models = list()
+
+schools_to_save <- c("harvard", "mit", "nd", "princeton", "stanford", "yale")
+alpha_values <- c(0.9, 0.9, 0.1, 0.7, 0.1, 0.1)
+
+for (i in 1:length(file_paths)) {
+  
+  school <- sub("_.*", "", college_names[i]) 
+  
+  train.ts = train_data[[i]]
+  
+  # need to remove trend (lag1) + seasonality (lag52)
+  diff.twice.train.ts <- diff(diff(train.ts, lag = 52), lag = 1)
+  
+  alpha_value <- alpha_values[which(schools_to_save == school)]
+  
+  # create predictions
+  ses <- ets(diff.twice.train.ts, model = "ANN", alpha = alpha_value)
+  ses.forecast <- forecast(ses, h = n_valid[[i]], level = 0)
+  
+  # save to list
+  ses_models[[school]] <- ses.forecast
+
+  p = autoplot(ses.forecast, series = paste("Simple Exponential Smoothing (alpha =", alpha_value, ")")) +
+    autolayer(valid_data[[i]], series = "Observed") +
+    geom_line(color = "black") + 
+    labs(title = paste(college_names[i], " - Alpha", alpha_value))
+  
+  print(p)
+}
+
+```
+
 #### (3) TSLM : Time Series Linear Model
 ```{r}
 tslm_models = list()
